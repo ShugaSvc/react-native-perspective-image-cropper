@@ -17,7 +17,7 @@
   ],
   "author": "Michaël Villeneuve",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "react-native-image-zoom": "https://github.com/irvingdp/react-native-image-zoom.git#v2.1.11"
   },
   "peerDependencies": {
