@@ -18,7 +18,7 @@
   "author": "Michaël Villeneuve",
   "license": "MIT",
   "devDependencies": {
-    "react-native-admob": "https://github.com/irvingdp/react-native-image-zoom.git#v2.1.11"
+    "react-native-image-zoom": "https://github.com/irvingdp/react-native-image-zoom.git#v2.1.11"
   },
   "peerDependencies": {
     "react": "16.0.0-alpha.6",
