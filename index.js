@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Animated, Dimensions, Image, PanResponder, View} from 'react-native';
-import Svg, {Path} from 'react-native-svg';
 import ImageZoom from 'react-native-image-pan-zoom';
 
 const DIRECTION = {
@@ -120,7 +119,6 @@ class CustomCrop extends Component {
         },
         onPanResponderMove: (evt, gs) => {
             this.updatePoints(DIRECTION.MOVE,gs);
-            this.updateSvgPolygon();
             this.updateForgroundImagePosition();
 
         },
@@ -184,7 +182,6 @@ class CustomCrop extends Component {
         onPanResponderMove: (evt, gs) => {
             if (this.boundaryCheck(direction, gs)) {
                 this.updatePoints(direction, gs);
-                this.updateSvgPolygon();
                 this.updateForgroundImageSize();
                 this.updateForgroundImagePosition();
             }
@@ -337,29 +334,14 @@ class CustomCrop extends Component {
         };
     }
 
-    updateSvgPolygon() {
-        if(this._polygonRef ) {
-            this._polygonRef.setNativeProps({
-                d: this.getSvgPath(),
-            })
-        }
-    }
 
-    getSvgPath() {
-        let {topLeft, topRight, bottomRight, bottomLeft} = this.state;
-        let p1 = this.getAnimatedValueXY(topLeft);
-        let p2 = this.getAnimatedValueXY(topRight);
-        let p3 = this.getAnimatedValueXY(bottomRight);
-        let p4 = this.getAnimatedValueXY(bottomLeft);
-        return (
-            `M${p1.x},${p2.y} L${p2.x},${p2.y} L${p3.x},${p3.y} L${p4.x},${p4.y}z`
-        )
-    }
+
+
 
     getAnimatedValueXY(a) {
         return {
-            x: parseInt(a.x._value + a.x._offset),
-            y: parseInt(a.y._value + a.y._offset),
+            x: (a.x._value + a.x._offset),
+            y: (a.y._value + a.y._offset),
         }
     }
 
@@ -370,9 +352,7 @@ class CustomCrop extends Component {
         minSize: 40 * 3,
         bgImageOpacity: 0.5,
         overlayStrokeColor: "blue",
-        overlayStrokeWidth: 3,
-        strokeDasharray: [],
-        strokeDashoffset: null,
+        overlayStrokeWidth: 0.5,
     };
 
     render() {
@@ -411,21 +391,7 @@ class CustomCrop extends Component {
         source={{uri: this.state.image}}
         />
         </ImageZoom>
-        <Svg
-        height={this.state.viewHeight}
-        width={screenWidth}
-        style={{position: 'absolute', left: 0, top: 0}}
-        {...this.state.imageZoomPanResponder.panHandlers}
-    >
-    <Path
-        ref={(ref) => ref && (this._polygonRef = ref)}
-        stroke={this.props.overlayStrokeColor}
-        strokeWidth={this.props.overlayStrokeWidth}
-        strokeDasharray={this.props.strokeDasharray}
-        strokeDashoffset={this.props.strokeDashoffset}
-        d={this.getSvgPath()}
-        />
-        </Svg>
+
         <Animated.View renderToHardwareTextureAndroid
         ref={(ref) => ref && (this._forgroundImageContainerRef = ref)}
         style={[
@@ -433,6 +399,12 @@ class CustomCrop extends Component {
         {width: this.getCropSize().width},
         {height: this.getCropSize().height},
         {position: "absolute", backgroundColor: "transparent", overflow: 'hidden'},
+        {
+            borderWidth: this.props.overlayStrokeWidth,
+                borderColor: this.props.overlayStrokeColor,
+            //borderStyle:'dashed',
+            //borderRadius: 0.1
+        }
     ]}
         {...this._forgroundImagePanResponder.panHandlers}>
     <Animated.Image
