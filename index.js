@@ -29,28 +29,30 @@ class CustomCrop extends Component {
             image: props.initialImage,
             hideStrict: false,
         };
+
+        this.initalTopLeft = props.rectangleCoordinates ? this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.topLeft, true) : {
+            x: 100,
+            y: 100
+        };
+        this.initalTopRight = props.rectangleCoordinates ? this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.topRight, true) : {
+            x: screenWidth - 100,
+            y: 100
+        };
+        this.initalBottomLeft = props.rectangleCoordinates ? this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.bottomLeft, true) : {
+            x: 100,
+            y: this.state.viewHeight - 100
+        };
+        this.initalBottomRight = props.rectangleCoordinates ? this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.bottomRight, true) : {
+            x: screenWidth - 100,
+            y: this.state.viewHeight - 100
+        };
+
         this.state = {
             ...this.state,
-            topLeft: new Animated.ValueXY(
-                props.rectangleCoordinates ?
-                    this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.topLeft, true) :
-                    {x: 100, y: 100}
-            ),
-            topRight: new Animated.ValueXY(
-                props.rectangleCoordinates ?
-                    this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.topRight, true) :
-                    {x: screenWidth - 100, y: 100}
-            ),
-            bottomLeft: new Animated.ValueXY(
-                props.rectangleCoordinates ?
-                    this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.bottomLeft, true) :
-                    {x: 100, y: this.state.viewHeight - 100}
-            ),
-            bottomRight: new Animated.ValueXY(
-                props.rectangleCoordinates ?
-                    this.imageCoordinatesToViewCoordinates(props.rectangleCoordinates.bottomRight, true) :
-                    {x: screenWidth - 100, y: this.state.viewHeight - 100}
-            ),
+            topLeft: new Animated.ValueXY(this.initalTopLeft),
+            topRight: new Animated.ValueXY(this.initalTopRight),
+            bottomLeft: new Animated.ValueXY(this.initalBottomLeft),
+            bottomRight: new Animated.ValueXY(this.initalBottomRight),
             imageZoomPanResponder: {panHandlers: {}},
         };
         this.panResponderTopLeft = this.createPanResponser(this.state.topLeft, DIRECTION.TOP_LEFT);
@@ -141,6 +143,17 @@ class CustomCrop extends Component {
             this.state.bottomLeft,
             this.state.bottomRight
         ];
+    }
+
+    resetCropPosition() {
+        let {rectangleCoordinates} = this.props;
+
+        this.state.topLeft.setValue(this.initalTopLeft);
+        this.state.topRight.setValue(this.initalTopRight);
+        this.state.bottomLeft.setValue(this.initalBottomLeft);
+        this.state.bottomRight.setValue(this.initalBottomRight);
+
+        this.updateMiddlePoints();
     }
 
     updateForgroundImagePosition() {
