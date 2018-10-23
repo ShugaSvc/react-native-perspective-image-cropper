@@ -209,6 +209,24 @@ class CustomCrop extends Component {
         });
     }
 
+    isTooSamll({dx, dy}) {
+        let {width, height} =  this.getCropSize();
+        if(width < this.props.minSize)
+            this.minDx === null && (this.minDx = dx);
+        else
+            this.minDx = null;
+
+        if(height < this.props.minSize)
+            this.minDy === null && (this.minDy = dy);
+        else
+            this.minDy = null;
+
+
+        return {
+            x: width < this.props.minSize,
+            y: height < this.props.minSize,
+        }
+    }
 
     getBoundaryDXY({dx, dy, direction}) {
         let isTooSamll = this.isTooSamll({dx, dy});
@@ -512,7 +530,7 @@ class CustomCrop extends Component {
         handlerColor: 'white',
         handlerLength: 25,
         handlerWidth: 3,
-        minSize: 25 * 3,
+        minSize: 20,
         bgImageOpacity: 0.5,
         overlayStrokeColor: "white",
         overlayStrokeWidth: 0.5,
