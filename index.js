@@ -538,7 +538,7 @@ class CustomCrop extends Component {
 
     render() {
         return (
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'flex-end'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                 <View style={[s(this.props).cropContainer, {height: this.state.viewHeight}]}>
                     <ImageZoom cropWidth={screenWidth}
                                cropHeight={this.state.viewHeight}
@@ -768,10 +768,7 @@ const s = (props) => {
             position: 'absolute',
         },
         cropContainer: {
-            position: 'absolute',
-            left: 0,
             width: screenWidth,
-            top: 0,
         }
     };
 };
