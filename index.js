@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Animated, Dimensions, Image, PanResponder, View} from 'react-native';
+import {Animated, Dimensions, Image, PanResponder, View, Platform} from 'react-native';
 import ImageZoom from 'react-native-image-pan-zoom';
+import Exif from 'react-native-exif';
 
 const DIRECTION = {
     MIDDLE_LEFT: 'MIDDLE_LEFT',
@@ -210,13 +211,13 @@ class CustomCrop extends Component {
     }
 
     isTooSamll({dx, dy}) {
-        let {width, height} =  this.getCropSize();
-        if(width < this.props.minSize)
+        let {width, height} = this.getCropSize();
+        if (width < this.props.minSize)
             this.minDx === null && (this.minDx = dx);
         else
             this.minDx = null;
 
-        if(height < this.props.minSize)
+        if (height < this.props.minSize)
             this.minDy === null && (this.minDy = dy);
         else
             this.minDy = null;
@@ -263,22 +264,45 @@ class CustomCrop extends Component {
         return (y / this._imageZoomInfo.scale) + (maxOffSetY / 2 - this._imageZoomInfo.positionY);
     }
 
-    getCropData() {
+    async getCropData() {
         const coordinates = {
             topLeft: this.viewCoordinatesToImageCoordinates(this.state.topLeft),
             topRight: this.viewCoordinatesToImageCoordinates(this.state.topRight),
             bottomLeft: this.viewCoordinatesToImageCoordinates(this.state.bottomLeft),
             bottomRight: this.viewCoordinatesToImageCoordinates(this.state.bottomRight),
         };
-        return ({
-            offset: {
-                x: parseInt(coordinates.topLeft.x),
-                y: parseInt(coordinates.topLeft.y),
-            },
-            size: {
-                width: parseInt(Math.abs(coordinates.topRight.x - coordinates.topLeft.x)),
-                height: parseInt(Math.abs(coordinates.topLeft.y - coordinates.bottomLeft.y)),
+
+        let size = {
+            width: parseInt(Math.abs(coordinates.topRight.x - coordinates.topLeft.x)),
+            height: parseInt(Math.abs(coordinates.topLeft.y - coordinates.bottomRight.y)),
+        };
+        let offset = {
+            x: parseInt(coordinates.topLeft.x),
+            y: parseInt(coordinates.topLeft.y),
+        };
+        // transform view crop coordinates per image orientation
+        // better solution is just to rotate image when transformig to Bitmap in ImageEditingManager.java...
+        // https://stackoverflow.com/questions/7286714/android-get-orientation-of-a-camera-bitmap-and-rotate-back-90-degrees
+        try {
+            if (Platform.OS === 'android') {
+                let exif = await Exif.getExif(this.state.image);
+                if (exif.Orientation == 6) {
+                    console.warn('exif.Orientation to flip CW by 90...');
+                    let tmpWidth = size.width;
+                    size.width = size.height;
+                    size.height = tmpWidth;
+
+                    offset.x = offset.y;
+                    offset.y = parseInt(this.state.width - coordinates.topRight.x);
+                }
             }
+        } catch (err) {
+            console.warn(err);
+        }
+
+        return ({
+            offset,
+            size
         });
     }
 
