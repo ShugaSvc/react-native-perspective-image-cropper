@@ -295,6 +295,15 @@ class CustomCrop extends Component {
                     offset.x = offset.y;
                     offset.y = parseInt(this.state.width - coordinates.topRight.x);
                 }
+                else if (exif.Orientation == 8) {
+                    console.warn('exif.Orientation to flip CW by 270...');
+                    let tmpWidth = size.width;
+                    size.width = size.height;
+                    size.height = tmpWidth;
+
+                    offset.x = parseInt(this.state.height - coordinates.bottomLeft.y);
+                    offset.y = offset.x;
+                }
             }
         } catch (err) {
             console.warn(err);
